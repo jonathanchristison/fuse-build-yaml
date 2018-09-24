@@ -22,7 +22,7 @@
 
   <groupId>com.redhat.fuse</groupId>
   <artifactId>fuse-build-yaml</artifactId>
-  <version>7.2.0.redhat-SNAPSHOT</version>
+  <version>7.2.0.fuse-720010</version>
   <packaging>pom</packaging>
   <name>Fuse Build YAML</name>
   <description>Fuse Build YAML descriptor generator</description>
@@ -43,135 +43,135 @@
     <version.fuse.prefix>7.2.0</version.fuse.prefix>
     <build.number>1</build.number>
     <spring-boot.version>1.5.13.RELEASE</spring-boot.version>
-    <version.camel>2.21.0.fuse-000096</version.camel>
-    <version.camel.extra>2.21.0.fuse-000073</version.camel.extra>
-    <version.cxf>3.1.11.fuse-000265</version.cxf>
-    <version.fabric8>3.0.8.fuse-000051</version.fabric8>
-    <version.fabric8.maven.plugin>3.5.33.fuse-000075</version.fabric8.maven.plugin>
-    <version.bom.fuse>7.0.1.fuse-000002</version.bom.fuse>
-    <version.karaf>4.2.0.fuse-000262</version.karaf>
-    <version.bom.wildfly.camel>5.1.0.fuse-000071</version.bom.wildfly.camel>
-    <version.fusesource.camel.sap>7.0.1.fuse-000002</version.fusesource.camel.sap>
-    <karaf.plugin.version>4.2.0.fuse-000262</karaf.plugin.version>
+    <version.camel>2.21.0.fuse-720022</version.camel>
+    <version.camel.extra>2.21.0.fuse-720022</version.camel.extra>
+    <version.cxf>3.1.11.fuse-720025</version.cxf>
+    <version.fabric8>3.0.11.fuse-720011</version.fabric8>
+    <version.fabric8.maven.plugin>3.5.33.fuse-720011</version.fabric8.maven.plugin>
+    <version.bom.fuse>7.2.0.fuse-720017</version.bom.fuse>
+    <version.karaf>4.2.0.fuse-720027</version.karaf>
+    <version.bom.wildfly.camel>5.2.0.fuse-720010</version.bom.wildfly.camel>
+    <version.fusesource.camel.sap>7.2.0.fuse-720019</version.fusesource.camel.sap>
+    <karaf.plugin.version>4.2.0.fuse-720027</karaf.plugin.version>
 
-    <application-templates.version>2.1.fuse-000091</application-templates.version>
-    <fuse-bom.version>7.1.0.fuse-000005</fuse-bom.version>
-    <version.hawtio>2.0.0.fuse-000186</version.hawtio>
-    <version.hawtio.online>1.0.0.fuse-000054</version.hawtio.online>
+    <application-templates.version>2.1.fuse-720006</application-templates.version>
+    <fuse-bom.version>7.2.0.fuse-720007</fuse-bom.version>
+    <version.hawtio>2.0.0.fuse-720018</version.hawtio>
+    <version.hawtio.online>1.0.0.fuse-720017</version.hawtio.online>
     <version.hawtio.integration>1.0.0.fuse-000034</version.hawtio.integration>
 
-    <version.kubernetes.model>2.0.9.fuse-000020</version.kubernetes.model>
-    <version.kubernetes.client>3.0.3.fuse-000056</version.kubernetes.client>
+    <version.kubernetes.model>2.0.10.fuse-720012</version.kubernetes.model>
+    <version.kubernetes.client>3.1.4.fuse-720015</version.kubernetes.client>
 
     <version.application.templates>2.1.fuse-000087</version.application.templates>
-    <version.cxf.xjc-utils>3.1.1.fuse-000118</version.cxf.xjc-utils>
+    <version.cxf.xjc-utils>3.2.3.fuse-720030</version.cxf.xjc-utils>
     <version.ipaas.quickstarts>2.2.0.fuse-000098</version.ipaas.quickstarts>
-    <version.spring-cloud-kubernetes>0.1.6.fuse-000056</version.spring-cloud-kubernetes>
-    <version.wsdl2rest>0.7.0.fuse-000071</version.wsdl2rest>
+    <version.spring-cloud-kubernetes>0.1.6.fuse-720015</version.spring-cloud-kubernetes>
+    <version.wsdl2rest>0.8.0.fuse-720022</version.wsdl2rest>
 
-    <docker.maven.plugin.version>0.23.0.fuse-000051</docker.maven.plugin.version>
-    <version.fuse.patch>3.0.0.fuse-000069</version.fuse.patch>
-    <version.wildfly.camel.examples>5.1.0.fuse-000047</version.wildfly.camel.examples>
-    <version.fuse.eap>7.0.1.fuse-000001</version.fuse.eap>
+    <docker.maven.plugin.version>0.23.0.fuse-720014</docker.maven.plugin.version>
+    <version.fuse.patch>3.1.0.fuse-720011</version.fuse.patch>
+    <version.wildfly.camel.examples>5.2.0.fuse-720008</version.wildfly.camel.examples>
+    <version.fuse.eap>7.2.0.fuse-720005</version.fuse.eap>
 
     <!-- quickstarts -->
-    <karaf-camel-amq.version>1.0.0.fuse-710004</karaf-camel-amq.version>
-    <karaf-camel-log.version>1.0.0.fuse-710004</karaf-camel-log.version>
-    <karaf-camel-rest-sql.version>1.0.0.fuse-710004</karaf-camel-rest-sql.version>
-    <karaf-cxf-rest.version>1.0.0.fuse-710004</karaf-cxf-rest.version>
-    <spring-boot-camel.version>1.0.0.fuse-710004</spring-boot-camel.version>
-    <spring-boot-camel-amq.version>1.0.0.fuse-710004</spring-boot-camel-amq.version>
-    <spring-boot-camel-config.version>1.0.0.fuse-710004</spring-boot-camel-config.version>
-    <spring-boot-camel-drools.version>1.0.0.fuse-710004</spring-boot-camel-drools.version>
-    <spring-boot-camel-infinispan.version>1.0.0.fuse-710004</spring-boot-camel-infinispan.version>
-    <spring-boot-camel-rest-sql.version>1.0.0.fuse-710004</spring-boot-camel-rest-sql.version>
-    <spring-boot-camel-teiid.version>1.0.0.fuse-710004</spring-boot-camel-teiid.version>
-    <spring-boot-camel-xml.version>1.0.0.fuse-710004</spring-boot-camel-xml.version>
-    <spring-boot-cxf-jaxrs.version>1.0.0.fuse-710004</spring-boot-cxf-jaxrs.version>
-    <spring-boot-cxf-jaxws.version>1.0.0.fuse-710004</spring-boot-cxf-jaxws.version>
+    <karaf-camel-amq.version>1.0.0.fuse-720006</karaf-camel-amq.version>
+    <karaf-camel-log.version>1.0.0.fuse-720006</karaf-camel-log.version>
+    <karaf-camel-rest-sql.version>1.0.0.fuse-720006</karaf-camel-rest-sql.version>
+    <karaf-cxf-rest.version>1.0.0.fuse-720006</karaf-cxf-rest.version>
+    <spring-boot-camel.version>1.0.0.fuse-720006</spring-boot-camel.version>
+    <spring-boot-camel-amq.version>1.0.0.fuse-720006</spring-boot-camel-amq.version>
+    <spring-boot-camel-config.version>1.0.0.fuse-720006</spring-boot-camel-config.version>
+    <spring-boot-camel-drools.version>1.0.0.fuse-720006</spring-boot-camel-drools.version>
+    <spring-boot-camel-infinispan.version>1.0.0.fuse-720006</spring-boot-camel-infinispan.version>
+    <spring-boot-camel-rest-sql.version>1.0.0.fuse-720006</spring-boot-camel-rest-sql.version>
+    <spring-boot-camel-teiid.version>1.0.0.fuse-720006</spring-boot-camel-teiid.version>
+    <spring-boot-camel-xml.version>1.0.0.fuse-720006</spring-boot-camel-xml.version>
+    <spring-boot-cxf-jaxrs.version>1.0.0.fuse-720006</spring-boot-cxf-jaxrs.version>
+    <spring-boot-cxf-jaxws.version>1.0.0.fuse-720006</spring-boot-cxf-jaxws.version>
 
     <!-- Tag and SCM info -->
-    <karaf.tag>1</karaf.tag>
-    <karaf.scmUrl>1</karaf.scmUrl>
-    <karaf.buildCommand>1</karaf.buildCommand>
-    <cxf-xjc-utils.tag>1</cxf-xjc-utils.tag>
-    <cxf-xjc-utils.scmUrl>1</cxf-xjc-utils.scmUrl>
-    <cxf-xjc-utils.buildCommand>1</cxf-xjc-utils.buildCommand>
-    <cxf.tag>1</cxf.tag>
-    <cxf.scmUrl>1</cxf.scmUrl>
-    <cxf.buildCommand>1</cxf.buildCommand>
-    <camel.tag>1</camel.tag>
-    <camel.scmUrl>1</camel.scmUrl>
-    <camel.buildCommand>1</camel.buildCommand>
-    <fuse-extras-distro.tag>1</fuse-extras-distro.tag>
-    <fuse-extras-distro.scmUrl>1</fuse-extras-distro.scmUrl>
-    <fuse-extras-distro.buildCommand>1</fuse-extras-distro.buildCommand>
-    <camel-extra.tag>1</camel-extra.tag>
-    <camel-extra.scmUrl>1</camel-extra.scmUrl>
-    <camel-extra.buildCommand>1</camel-extra.buildCommand>
-    <wsdl2rest.tag>1</wsdl2rest.tag>
-    <wsdl2rest.scmUrl>1</wsdl2rest.scmUrl>
-    <wsdl2rest.buildCommand>1</wsdl2rest.buildCommand>
-    <fuse-components.tag>1</fuse-components.tag>
-    <fuse-components.scmUrl>1</fuse-components.scmUrl>
-    <fuse-components.buildCommand>1</fuse-components.buildCommand>
-    <hawtio.tag>1</hawtio.tag>
-    <hawtio.scmUrl>1</hawtio.scmUrl>
-    <hawtio.buildCommand>1</hawtio.buildCommand>
-    <hawtio-online.tag>1</hawtio-online.tag>
-    <hawtio-online.scmUrl>1</hawtio-online.scmUrl>
-    <hawtio-online.buildCommand>1</hawtio-online.buildCommand>
-    <fuse-karaf.tag>1</fuse-karaf.tag>
-    <fuse-karaf.scmUrl>1</fuse-karaf.scmUrl>
-    <fuse-karaf.buildCommand>1</fuse-karaf.buildCommand>
-    <kubernetes-model.tag></kubernetes-model.tag>
-    <kubernetes-model.scmUrl>1</kubernetes-model.scmUrl>
-    <kubernetes-model.buildCommand>1</kubernetes-model.buildCommand>
-    <kubernetes-client.tag>1</kubernetes-client.tag>
-    <kubernetes-client.scmUrl>1</kubernetes-client.scmUrl>
-    <kubernetes-client.buildCommand>1</kubernetes-client.buildCommand>
-    <spring-cloud-kubernetes.tag>1</spring-cloud-kubernetes.tag>
-    <spring-cloud-kubernetes.scmUrl>1</spring-cloud-kubernetes.scmUrl>
-    <spring-cloud-kubernetes.buildCommand>1</spring-cloud-kubernetes.buildCommand>
-    <docker-maven-plugin.tag>1</docker-maven-plugin.tag>
-    <docker-maven-plugin.scmUrl>1</docker-maven-plugin.scmUrl>
-    <docker-maven-plugin.buildCommand>1</docker-maven-plugin.buildCommand>
-    <narayana-spring-boot.tag>1</narayana-spring-boot.tag>
-    <narayana-spring-boot.scmUrl>1</narayana-spring-boot.scmUrl>
-    <narayana-spring-boot.buildCommand>1</narayana-spring-boot.buildCommand>
-    <fabric8v2.tag>1</fabric8v2.tag>
-    <fabric8v2.scmUrl>1</fabric8v2.scmUrl>
-    <fabric8v2.buildCommand>1</fabric8v2.buildCommand>
-    <fabric8-maven-plugin.tag>1</fabric8-maven-plugin.tag>
-    <fabric8-maven-plugin.scmUrl>1</fabric8-maven-plugin.scmUrl>
-    <fabric8-maven-plugin.buildCommand>1</fabric8-maven-plugin.buildCommand>
-    <fuse-patch.tag>1</fuse-patch.tag>
-    <fuse-patch.scmUrl>1</fuse-patch.scmUrl>
-    <fuse-patch.buildCommand>1</fuse-patch.buildCommand>
-    <wildfly-camel.tag>1</wildfly-camel.tag>
-    <wildfly-camel.scmUrl>1</wildfly-camel.scmUrl>
-    <wildfly-camel.buildCommand>1</wildfly-camel.buildCommand>
-    <apicurito.tag>1</apicurito.tag>
-    <apicurito.scmUrl>1</apicurito.scmUrl>
-    <apicurito.buildCommand>1</apicurito.buildCommand>
-    <redhat-fuse.tag>1</redhat-fuse.tag>
-    <redhat-fuse.scmUrl>1</redhat-fuse.scmUrl>
-    <redhat-fuse.buildCommand>1</redhat-fuse.buildCommand>
-    <fuse-apicurito-generator.tag>1</fuse-apicurito-generator.tag>
-    <fuse-apicurito-generator.scmUrl>1</fuse-apicurito-generator.scmUrl>
-    <fuse-apicurito-generator.buildCommand>1</fuse-apicurito-generator.buildCommand>
-    <wildfly-camel-examples.tag>1</wildfly-camel-examples.tag>
-    <wildfly-camel-examples.scmUrl>1</wildfly-camel-examples.scmUrl>
-    <wildfly-camel-examples.buildCommand>1</wildfly-camel-examples.buildCommand>
-    <fuse-eap.tag>1</fuse-eap.tag>
-    <fuse-eap.scmUrl>1</fuse-eap.scmUrl>
-    <fuse-eap.buildCommand>1</fuse-eap.buildCommand>
-    <ipaas-quickstarts.tag>1</ipaas-quickstarts.tag>
-    <ipaas-quickstarts.scmUrl>1</ipaas-quickstarts.scmUrl>
-    <ipaas-quickstarts.buildCommand>1</ipaas-quickstarts.buildCommand>
+    <karaf.tag>4.2.x.redhat-7-x</karaf.tag>
+    <karaf.scmUrl>git%40github.com%3Ajboss-fuse%2Fkaraf.git</karaf.scmUrl>
+    <karaf.buildCommand>mvn+-e+-V+-B+-DskipTests+-DfailIfNoTests%3Dfalse+-Dtest%3Dfalse+-P+clean+install+-DskipClean+-DskipTests%3Dtrue</karaf.buildCommand>
+    <cxf-xjc-utils.tag>master</cxf-xjc-utils.tag>
+    <cxf-xjc-utils.scmUrl>https%3A%2F%2Fgithub.com%2Fapache%2Fcxf-xjc-utils.git</cxf-xjc-utils.scmUrl>
+    <cxf-xjc-utils.buildCommand>mvn+-e+-V+-B+-DskipTests+-DfailIfNoTests%3Dfalse+-Dtest%3Dfalse+-P+clean+install+-Dcheckstyle.skip</cxf-xjc-utils.buildCommand>
+    <cxf.tag>3.1.11.redhat-7-x</cxf.tag>
+    <cxf.scmUrl>git%40github.com%3Ajboss-fuse%2Fcxf.git</cxf.scmUrl>
+    <cxf.buildCommand>mvn+-e+-V+-B+-DskipTests+-DfailIfNoTests%3Dfalse+-Dtest%3Dfalse+-Pdeploy+clean+install+</cxf.buildCommand>
+    <camel.tag>2.21.x.redhat-7-x</camel.tag>
+    <camel.scmUrl>git%40github.com%3Ajboss-fuse%2Fcamel.git</camel.scmUrl>
+    <camel.buildCommand>mvn+-e+-V+-B+-DskipTests+-DfailIfNoTests%3Dfalse+-Dtest%3Dfalse+-Penable-schemagen%2Crelease%2Capt+clean+install+-DkeepStagingRepositoryOnCloseRuleFailure%3Dtrue</camel.buildCommand>
+    <fuse-extras-distro.tag>7.x.redhat-7-x</fuse-extras-distro.tag>
+    <fuse-extras-distro.scmUrl>git%40github.com%3Ajboss-fuse%2Ffuse-extras-distro.git</fuse-extras-distro.scmUrl>
+    <fuse-extras-distro.buildCommand>mvn+-e+-V+-B+-DskipTests+-DfailIfNoTests%3Dfalse+-Dtest%3Dfalse+-Pgenerate-licenses-xml+clean+install+</fuse-extras-distro.buildCommand>
+    <camel-extra.tag>2.21.x.redhat-7-x</camel-extra.tag>
+    <camel-extra.scmUrl>git%40github.com%3Ajboss-fuse%2Fcamel-extra.git</camel-extra.scmUrl>
+    <camel-extra.buildCommand>mvn+-e+-V+-B+-DskipTests+-DfailIfNoTests%3Dfalse+-Dtest%3Dfalse+-P+clean+install+</camel-extra.buildCommand>
+    <wsdl2rest.tag>0.7.x.redhat-7-x</wsdl2rest.tag>
+    <wsdl2rest.scmUrl>git%40github.com%3Ajboss-fuse%2Fwsdl2rest.git</wsdl2rest.scmUrl>
+    <wsdl2rest.buildCommand>mvn+-e+-V+-B+-DskipTests+-DfailIfNoTests%3Dfalse+-Dtest%3Dfalse+-P+clean+install+</wsdl2rest.buildCommand>
+    <fuse-components.tag>7.x.redhat-7-x</fuse-components.tag>
+    <fuse-components.scmUrl>git%40github.com%3Ajboss-fuse%2Ffuse-components.git</fuse-components.scmUrl>
+    <fuse-components.buildCommand>mvn+-e+-V+-B+-DskipTests+-DfailIfNoTests%3Dfalse+-Dtest%3Dfalse+-Prelease%2Call%2Cenable-schemagen%2Cdeploy%2Cts.all%2Cjaxws22%2Cnochecks%2Csap%2Cquickstarts%2Capt%2Cspring3.2%2Cjetty9+clean+install+-U+</fuse-components.buildCommand>
+    <hawtio.tag>2.x-redhat</hawtio.tag>
+    <hawtio.scmUrl>git%40github.com%3Ajboss-fuse%2Fhawtio.git</hawtio.scmUrl>
+    <hawtio.buildCommand>mvn+-e+-V+-B+-DskipTests+-DfailIfNoTests%3Dfalse+-Dtest%3Dfalse+-P+clean+install+</hawtio.buildCommand>
+    <hawtio-online.tag>1.x-redhat-7.x</hawtio-online.tag>
+    <hawtio-online.scmUrl>git%40github.com%3Ahawtio%2Fhawtio-online.git</hawtio-online.scmUrl>
+    <hawtio-online.buildCommand>mvn+-e+-V+-B+-DskipTests+-DfailIfNoTests%3Dfalse+-Dtest%3Dfalse+-P+clean+install+</hawtio-online.buildCommand>
+    <fuse-karaf.tag>7.x.redhat-7-x</fuse-karaf.tag>
+    <fuse-karaf.scmUrl>git%40github.com%3Ajboss-fuse%2Ffuse-karaf.git</fuse-karaf.scmUrl>
+    <fuse-karaf.buildCommand>mvn+-e+-V+-B+-DskipTests+-DfailIfNoTests%3Dfalse+-Dtest%3Dfalse+-Psap+clean+install+</fuse-karaf.buildCommand>
+    <kubernetes-model.tag>2.0.x.redhat-7-x</kubernetes-model.tag>
+    <kubernetes-model.scmUrl>git%40github.com%3Ajboss-fuse%2Fkubernetes-model.git</kubernetes-model.scmUrl>
+    <kubernetes-model.buildCommand>mvn+-e+-V+-B+-DskipTests+-DfailIfNoTests%3Dfalse+-Dtest%3Dfalse+-P+clean+install+</kubernetes-model.buildCommand>
+    <kubernetes-client.tag>v3.1.4.redhat</kubernetes-client.tag>
+    <kubernetes-client.scmUrl>git%40github.com%3Afabric8io%2Fkubernetes-client.git</kubernetes-client.scmUrl>
+    <kubernetes-client.buildCommand>mvn+-e+-V+-B+-DskipTests+-DfailIfNoTests%3Dfalse+-Dtest%3Dfalse+-P+clean+install+</kubernetes-client.buildCommand>
+    <spring-cloud-kubernetes.tag>0.1.x.redhat-7-x</spring-cloud-kubernetes.tag>
+    <spring-cloud-kubernetes.scmUrl>git%40github.com%3Ajboss-fuse%2Fspring-cloud-kubernetes.git</spring-cloud-kubernetes.scmUrl>
+    <spring-cloud-kubernetes.buildCommand>mvn+-e+-V+-B+-DskipTests+-DfailIfNoTests%3Dfalse+-Dtest%3Dfalse+-P+clean+install+</spring-cloud-kubernetes.buildCommand>
+    <docker-maven-plugin.tag>0.23.x.redhat-7-x</docker-maven-plugin.tag>
+    <docker-maven-plugin.scmUrl>git%40github.com%3Ajboss-fuse%2Fdocker-maven-plugin.git</docker-maven-plugin.scmUrl>
+    <docker-maven-plugin.buildCommand>mvn+-e+-V+-B+-DskipTests+-DfailIfNoTests%3Dfalse+-Dtest%3Dfalse+-P+clean+install+</docker-maven-plugin.buildCommand>
+    <narayana-spring-boot.tag>1.0.x</narayana-spring-boot.tag>
+    <narayana-spring-boot.scmUrl>git%40github.com%3Asnowdrop%2Fnarayana-spring-boot.git</narayana-spring-boot.scmUrl>
+    <narayana-spring-boot.buildCommand>mvn+-e+-V+-B+-DskipTests+-DfailIfNoTests%3Dfalse+-Dtest%3Dfalse+-P+clean+install+-DskipClean</narayana-spring-boot.buildCommand>
+    <fabric8v2.tag>3.0.11.redhat-7.x</fabric8v2.tag>
+    <fabric8v2.scmUrl>git%40github.com%3Ajboss-fuse%2Ffabric8.git</fabric8v2.scmUrl>
+    <fabric8v2.buildCommand>mvn+-e+-V+-B+-DskipTests+-DfailIfNoTests%3Dfalse+-Dtest%3Dfalse+-P+clean+install+</fabric8v2.buildCommand>
+    <fabric8-maven-plugin.tag>3.5.x.redhat-7-x</fabric8-maven-plugin.tag>
+    <fabric8-maven-plugin.scmUrl>git%40github.com%3Ajboss-fuse%2Ffabric8-maven-plugin.git</fabric8-maven-plugin.scmUrl>
+    <fabric8-maven-plugin.buildCommand>mvn+-e+-V+-B+-DskipTests+-DfailIfNoTests%3Dfalse+-Dtest%3Dfalse+-P+clean+install+</fabric8-maven-plugin.buildCommand>
+    <fuse-patch.tag>3.1.x.redhat-7-x</fuse-patch.tag>
+    <fuse-patch.scmUrl>git%40github.com%3Ajboss-fuse%2Ffuse-patch.git</fuse-patch.scmUrl>
+    <fuse-patch.buildCommand>mvn+-e+-V+-B+-DskipTests+-DfailIfNoTests%3Dfalse+-Dtest%3Dfalse+-Pdeploy+clean+install+</fuse-patch.buildCommand>
+    <wildfly-camel.tag>5.2.x.redhat-7-x</wildfly-camel.tag>
+    <wildfly-camel.scmUrl>git%40github.com%3Ajboss-fuse%2Fwildfly-camel.git</wildfly-camel.scmUrl>
+    <wildfly-camel.buildCommand>mvn+-e+-V+-B+-DskipTests+-DfailIfNoTests%3Dfalse+-Dtest%3Dfalse+-P+clean+install+-U+-Dts.all+-Ddocker+-Ddocker.push+-Ddocker.username%3Dunused+-Ddocker.password%3DeyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJqYm9zcy1mdXNlIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6ImNpLXNlcnZpY2UtYWNjb3VudC10b2tlbi0zNTVrZSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50Lm5hbWUiOiJjaS1zZXJ2aWNlLWFjY291bnQiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiI3NmEyYzU0ZS03NmI1LTExZTctODhmNi0wMDFhNGFlMGRmNDMiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6amJvc3MtZnVzZTpjaS1zZXJ2aWNlLWFjY291bnQifQ.xeRFxiuywyQBEYwdOzrRjEt1jMOikkfS5d6mSn_C7__RLMSIZXUiSTtMaE9mLe-6yIYKs2ixX_7AvKLkmo0wHg3G_JGNoWXJW69NgO8e_ko1AZnxBEZ6gOGNVat5OhIFbApYs651qCO0v9W28vv1Z8ilQHKbvCs6mOd7Eev7TKtNW910-lVRWPI5e_TfRgiTGxNb08OYWlUpWreYBANdnrnKdQ25T6nSRngEPLU2x7DJkvlzlVMqAvw3_PwFrmYfhG-QBRvKgj7zb1gpQ1M91_I9MqJ3VISM6DN2ed9QApTyStcFV2DpC_O7yHG9wKKbrodr17vo6W3Ux4Dru6OfTQ+-Ddocker.image.name%3Ddocker-registry.engineering.redhat.com%2Ffuse7%2Ffuse-eap-openshift+-Ddocker.image.version%3D1.0</wildfly-camel.buildCommand>
+    <apicurito.tag>master</apicurito.tag>
+    <apicurito.scmUrl>git%40github.com%3Aapicurio%2Fapicurito.git</apicurito.scmUrl>
+    <apicurito.buildCommand>mvn+-e+-V+-B+-DskipTests+-DfailIfNoTests%3Dfalse+-Dtest%3Dfalse+-P+clean+install+-DskipClean</apicurito.buildCommand>
+    <redhat-fuse.tag>7.x.redhat-7-x</redhat-fuse.tag>
+    <redhat-fuse.scmUrl>git%40github.com%3Ajboss-fuse%2Fredhat-fuse.git</redhat-fuse.scmUrl>
+    <redhat-fuse.buildCommand>mvn+-e+-V+-B+-DskipTests+-DfailIfNoTests%3Dfalse+-Dtest%3Dfalse+-P+clean+install+-DskipClean</redhat-fuse.buildCommand>
+    <fuse-apicurito-generator.tag>master</fuse-apicurito-generator.tag>
+    <fuse-apicurito-generator.scmUrl>git%40github.com%3Ajboss-fuse%2Ffuse-apicurito-generator.git</fuse-apicurito-generator.scmUrl>
+    <fuse-apicurito-generator.buildCommand>mvn+-e+-V+-B+-DskipTests+-DfailIfNoTests%3Dfalse+-Dtest%3Dfalse+-P+clean+install+-DskipClean</fuse-apicurito-generator.buildCommand>
+    <wildfly-camel-examples.tag>5.2.x.redhat-7-x</wildfly-camel-examples.tag>
+    <wildfly-camel-examples.scmUrl>git%40github.com%3Awildfly-extras%2Fwildfly-camel-examples.git</wildfly-camel-examples.scmUrl>
+    <wildfly-camel-examples.buildCommand>mvn+-e+-V+-B+-DskipTests+-DfailIfNoTests%3Dfalse+-Dtest%3Dfalse+-P+clean+install+</wildfly-camel-examples.buildCommand>
+    <fuse-eap.tag>master</fuse-eap.tag>
+    <fuse-eap.scmUrl>git%40github.com%3Ajboss-fuse%2Ffuse-eap.git</fuse-eap.scmUrl>
+    <fuse-eap.buildCommand>mvn+-e+-V+-B+-DskipTests+-DfailIfNoTests%3Dfalse+-Dtest%3Dfalse+-P+clean+install+</fuse-eap.buildCommand>
+    <ipaas-quickstarts.tag>master</ipaas-quickstarts.tag>
+    <ipaas-quickstarts.scmUrl>git%40github.com%3Afabric8io%2Fipaas-quickstarts.git</ipaas-quickstarts.scmUrl>
+    <ipaas-quickstarts.buildCommand>mvn+-e+-V+-B+-DskipTests+-DfailIfNoTests%3Dfalse+-Dtest%3Dfalse+-P+clean+install+-Dquickstart.git.repos%3Drepolist.txt</ipaas-quickstarts.buildCommand>
     <application-templates.tags>1</application-templates.tags>
-    <application-templates.scmUrl>1</application-templates.scmUrl>
-    <application-templates.buildCommand>1</application-templates.buildCommand>
+    <application-templates.scmUrl>git%40github.com%3Ajboss-fuse%2Fapplication-templates.git</application-templates.scmUrl>
+    <application-templates.buildCommand>mvn+-e+-V+-B+-DskipTests+-DfailIfNoTests%3Dfalse+-Dtest%3Dfalse+-P+clean+install+</application-templates.buildCommand>
   </properties>
 
   <build>
