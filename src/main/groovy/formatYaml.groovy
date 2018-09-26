@@ -5,9 +5,47 @@ import org.yaml.snakeyaml.Yaml
 import java.nio.file.Paths
 import java.nio.file.Path
 import java.util.regex.Pattern
+import java.util.regex.Matcher
 import groovy.util.logging.Slf4j
 import java.net.URLDecoder
 import groovy.json.JsonOutput.*
+import com.rits.cloning.Cloner
+
+@Slf4j
+class versionManipulator 
+{
+    //public static final Pattern OSGIPattern = Pattern.compile("(?:\w*)(?<major>\d+).*)")
+    //public static final Pattern redhatQualifierPattern = Pattern.compile("^[\w-]*-?redhat-(\d+)")
+
+    protected String original
+
+    //Our version deciminated to ints
+    public Integer major
+    public Integer minor
+    public Integer micro 
+    public String qualifier
+
+    versionManipulator(String v)
+    {
+        //Grab our likely version string
+        log.debug("Looking for version in $v")
+        original = v
+        Pattern osgip = Pattern.compile("(?:\\w*)(?<major>\\d+).*")
+        Matcher m = osgip(v)
+        if (m.find())
+        {
+            log.info("Found $m.group(0), $m.group(1), $m.group(2)")
+        }
+    }
+
+    /*
+    versionManipulator(versionManipulator)
+    {
+    }
+    */
+
+
+}
 
 /* BuildConfigSection yaml */
 @Slf4j
@@ -15,48 +53,56 @@ class BuildConfigSection {
 
     private final ArrayList parsedSection
     private final String rawSection
+    public ArrayList adjustedParsedSection 
     
-    /* Steps
-    1) Load/parse yaml object
-    2) Preparse commented sections
-    3) Magic (functions for common ops)
-    4) Add to parsed yaml
-    */
-
     BuildConfigSection(String rawSection)
     {
+        //Copy our section
         this.rawSection = rawSection
         def sectionHeader = (rawSection.split("\n")[0]).replace("- name:  ", "")
+        
         log.info("Parsing build section: $sectionHeader")
+        
+        //Parse it
         def yml = new Yaml()
         parsedSection = yml.load(this.rawSection)
+
+        //Make a cloned "working copy"
+        def cloner = new Cloner()
+        adjustedParsedSection = cloner.deepClone(parsedSection) 
     }
 
     public ArrayList getOriginal()
     {
         return parsedSection
     }
+
+    public ArrayList getAdjusted()
+    {
+        return adjustedParsedSection
+    }
+
     public String decodeURLs(String encodedURL)
     {
         return URLDecoder.decode(encodedURL, "UTF-8");
     }
 
-    public ArrayList getExtrasAsArray()
+    public void commentsToArray()
     {
-        return new Yaml().load(getExtras())
+        adjustedParsedSection = new Yaml().load(commentsToString(rawSection))
     }
 
-    public String getExtras()
+    public String commentsToString(String raw)
     {
-        def stripped = rawSection.replaceAll("([\\s]{4}#)", "  ")
+        def stripped = raw.replaceAll("([\\s]{4}#)", "  ")
         log.debug("Merging commented fields and reparsing...\n")
         log.debug("Unmerged:\n\t$rawSection Merged:\n\t$stripped")
         return stripped
     }
 
-    public ArrayList getAsDecodedURL(ArrayList parsed)
+    public void decodedURL()
     {
-        for ( a in parsed )
+        for ( a in adjustedParsedSection )
         {
             for (k in a.keySet())
             {
@@ -64,32 +110,25 @@ class BuildConfigSection {
                     a[k] = decodeURLs(a[k])
             }
         }
-        return parsed
     }
 
-    public ArrayList swapInternalAndExternalURL()
+    public void swapInternalAndExternalURL()
     {
-        def extras = getExtrasAsArray()
-        def decoded = getAsDecodedURL(extras)
+        this.commentsToArray()
+        this.decodedURL()
 
-        def diff =  decoded[0] - parsedSection[0]
-        
-        println parsedSection.getClass()
-        println parsedSection[0].getClass()
-        //Do a deep copy here
-        def ret = parsedSection 
-        ret[0]['scmUrl'] = diff['internalScmUrl']
-        return ret
+        def diff =  getAdjusted()[0] - getOriginal()[0]
+
+        if(diff['internalScmUrl'])
+        {
+            adjustedParsedSection[0]['scmUrl'] = diff['internalScmUrl']
+        }
     }
 
-    public void adjustProject()
+    public void adjustProjectName()
     {
-
+        version = new versionManipulator(getAdjusted()[0]['name'])
     }
-    //public Yaml decodeURLs()
-    //{
-    //    //return java.netURLDecoder.decode(encodedurl, "UTF-8");
-    //}
 
 }
 
@@ -143,7 +182,9 @@ class BuildConfig {
                 log.debug("\n\n\n" + "-------START------\n" + "- name: $p" + "########END#######\n")
                 def section = new BuildConfigSection("- name: "+p)
                 buildConfigs.add(section)
-                println section.swapInternalAndExternalURL()
+                section.swapInternalAndExternalURL()
+                section.adjustProjectName()
+                println section.getAdjusted()
                 println section.getOriginal()
             }
         }
