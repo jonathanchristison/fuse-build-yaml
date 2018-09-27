@@ -10,41 +10,102 @@ import groovy.util.logging.Slf4j
 import java.net.URLDecoder
 import groovy.json.JsonOutput.*
 import com.rits.cloning.Cloner
+import java.net.URI
 
 @Slf4j
 class versionManipulator 
 {
-    //public static final Pattern OSGIPattern = Pattern.compile("(?:\w*)(?<major>\d+).*)")
+    //public static final Pattern OSGIPattern = Pattern.compile("(?:\\w*)(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<micro>\\d+)(?:.|-)(?:<qualifier>(\\w*|\\d)*.*)")
+    public static final Pattern OSGIPattern = Pattern.compile("(?:[\\w|-]*)((?<major>\\d+)\\.(?<minor>\\d+)\\.(?<micro>\\d+)){1}(?:[\\.|-])?(?<qualifier>.*)")
     //public static final Pattern redhatQualifierPattern = Pattern.compile("^[\w-]*-?redhat-(\d+)")
 
     protected String original
 
     //Our version deciminated to ints
-    public Integer major
-    public Integer minor
-    public Integer micro 
+    public Integer major = 0
+    public Integer minor = 0
+    public Integer micro = 0
     public String qualifier
+
+    versionManipulator(Integer major, Integer minor, Integer micro, String qualifier)
+    {
+        log.info("Maj: $major Minor: $minor Micro: $micro Qualifier: $qualifier")
+        this.major = major
+        this.minor = minor
+        this.micro = micro
+        this.qualifier = qualifier
+    }
 
     versionManipulator(String v)
     {
         //Grab our likely version string
-        log.debug("Looking for version in $v")
-        original = v
-        Pattern osgip = Pattern.compile("(?:\\w*)(?<major>\\d+).*")
-        Matcher m = osgip(v)
+        log.debug("Looking for version in string $v")
+        original = (String) v
+
+        Matcher m = OSGIPattern.matcher(v)
+
         if (m.find())
         {
-            log.info("Found $m.group(0), $m.group(1), $m.group(2)")
+            for (int i=0; i < m.groupCount(); i++)
+            {
+                String mat = m.group(i)
+                log.debug("Found $mat")
+            }
+            major = major.valueOf(m.group("major"))
+            minor = minor.valueOf(m.group("minor"))
+            micro = micro.valueOf(m.group("micro"))
+            qualifier = m.group("qualifier")
         }
+
     }
 
+    public String getOriginal()
+    {
+        return original
+    }
+
+    @Override
+    public String toString()
+    {
+        return String.format("%s.%s", semverString(), qualifier)
+    }
+
+    public String semverString()
+    {
+        return String.format("%d.%d.%d", major, minor, micro)
+    }
+
+    public ArrayList<Integer> semverArray()
+    {
+        return ArrayList[major, minor, micro]
+    }
+    
+    public Map<String, Integer> semverMap()
+    {
+        Map<String, Integer> semverMap = new HashMap<String, Integer>(
+            "major":major,
+            "minor":minor,
+            "micro":micro);
+    }
+   
+    public String swap(versionManipulator other)
+    {
+        def o = this.original
+        return o.replaceAll(semverString(), other.semverString())
+    }
+    /*
+    public Integer compare(versionManipulator other)
+    {
+        //-1 less than
+        //0 match 
+        //1 greater than
+    }
+    */
     /*
     versionManipulator(versionManipulator)
     {
     }
     */
-
-
 }
 
 /* BuildConfigSection yaml */
@@ -69,7 +130,7 @@ class BuildConfigSection {
 
         //Make a cloned "working copy"
         def cloner = new Cloner()
-        adjustedParsedSection = cloner.deepClone(parsedSection) 
+        adjustedParsedSection = cloner.deepClone(parsedSection)
     }
 
     public ArrayList getOriginal()
@@ -125,9 +186,31 @@ class BuildConfigSection {
         }
     }
 
+    public void adjustBuildConfigName()
+    {
+        def version = new versionManipulator(getAdjusted()[0]['name'])
+        def scmVersion = new versionManipulator(getAdjusted()[0]['scmRevision'])
+        if (!version.semverMap().equals(scmVersion.semverMap()))
+        {
+            log.info("Adjusting version in BC name as it differs from tag:")
+            log.debug("version: " + (String)version.semverMap() + " scmVersion: " + (String)scmVersion.semverMap())
+            def orig = version.getOriginal()
+            def altered = version.swap(scmVersion)
+            adjustedParsedSection[0]['name'] = altered
+            log.info("Before: $orig After: $altered")
+        }
+    }
+
     public void adjustProjectName()
     {
-        version = new versionManipulator(getAdjusted()[0]['name'])
+        def project = getAdjusted()[0]['project']
+        def uri = URI(getAdjusted()[0]['scmUrl'])
+        String repo, proj = project.split("/")
+        //Parse the URI and get path section (we could do this with regex but i'm lazy)
+        def path = uri.getPath()
+        String srepo, sproj = path.split("/")
+        if(proj.equals(sproj))
+            print "same project!"
     }
 
 }
@@ -183,9 +266,10 @@ class BuildConfig {
                 def section = new BuildConfigSection("- name: "+p)
                 buildConfigs.add(section)
                 section.swapInternalAndExternalURL()
+                section.adjustBuildConfigName()
                 section.adjustProjectName()
-                println section.getAdjusted()
-                println section.getOriginal()
+                //println section.getAdjusted()
+                //println section.getOriginal()
             }
         }
     }
