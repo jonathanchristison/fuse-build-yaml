@@ -1,6 +1,7 @@
 package com.redhat.fuse
 
 import org.yaml.snakeyaml.Yaml
+import org.yaml.snakeyaml.DumperOptions
 //import org.jboss.prod.preProcessYaml
 import java.nio.file.Paths
 import java.nio.file.Path
@@ -8,14 +9,14 @@ import java.util.regex.Pattern
 import java.util.regex.Matcher
 import groovy.util.logging.Slf4j
 import java.net.URLDecoder
+import java.net.URLEncoder
 import groovy.json.JsonOutput.*
 import com.rits.cloning.Cloner
 import java.net.URI
 
 @Slf4j
-class versionManipulator 
+class VersionManipulator 
 {
-    //public static final Pattern OSGIPattern = Pattern.compile("(?:\\w*)(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<micro>\\d+)(?:.|-)(?:<qualifier>(\\w*|\\d)*.*)")
     public static final Pattern OSGIPattern = Pattern.compile("(?:[\\w|-]*)((?<major>\\d+)\\.(?<minor>\\d+)\\.(?<micro>\\d+)){1}(?:[\\.|-])?(?<qualifier>.*)")
     //public static final Pattern redhatQualifierPattern = Pattern.compile("^[\w-]*-?redhat-(\d+)")
 
@@ -27,7 +28,7 @@ class versionManipulator
     public Integer micro = 0
     public String qualifier
 
-    versionManipulator(Integer major, Integer minor, Integer micro, String qualifier)
+    VersionManipulator(Integer major, Integer minor, Integer micro, String qualifier)
     {
         log.info("Maj: $major Minor: $minor Micro: $micro Qualifier: $qualifier")
         this.major = major
@@ -36,7 +37,7 @@ class versionManipulator
         this.qualifier = qualifier
     }
 
-    versionManipulator(String v)
+    VersionManipulator(String v)
     {
         //Grab our likely version string
         log.debug("Looking for version in string $v")
@@ -88,13 +89,13 @@ class versionManipulator
             "micro":micro);
     }
    
-    public String swap(versionManipulator other)
+    public String swap(VersionManipulator other)
     {
         def o = this.original
         return o.replaceAll(semverString(), other.semverString())
     }
     /*
-    public Integer compare(versionManipulator other)
+    public Integer compare(VersionManipulator other)
     {
         //-1 less than
         //0 match 
@@ -102,7 +103,7 @@ class versionManipulator
     }
     */
     /*
-    versionManipulator(versionManipulator)
+    VersionManipulator(VersionManipulator)
     {
     }
     */
@@ -145,6 +146,10 @@ class BuildConfigSection {
 
     public String decodeURLs(String encodedURL)
     {
+        //We dont need to decode the non-encoded URIs 
+        if (encodedURL.startsWith("git+ssh"))
+            return encodedURL
+
         return URLDecoder.decode(encodedURL, "UTF-8");
     }
 
@@ -180,6 +185,7 @@ class BuildConfigSection {
 
         def diff =  getAdjusted()[0] - getOriginal()[0]
 
+        //This will be changing soon
         if(diff['internalScmUrl'])
         {
             adjustedParsedSection[0]['scmUrl'] = diff['internalScmUrl']
@@ -188,8 +194,8 @@ class BuildConfigSection {
 
     public void adjustBuildConfigName()
     {
-        def version = new versionManipulator(getAdjusted()[0]['name'])
-        def scmVersion = new versionManipulator(getAdjusted()[0]['scmRevision'])
+        def version = new VersionManipulator(getAdjusted()[0]['name'])
+        def scmVersion = new VersionManipulator(getAdjusted()[0]['scmRevision'])
         if (!version.semverMap().equals(scmVersion.semverMap()))
         {
             log.info("Adjusting version in BC name as it differs from tag:")
@@ -197,22 +203,59 @@ class BuildConfigSection {
             def orig = version.getOriginal()
             def altered = version.swap(scmVersion)
             adjustedParsedSection[0]['name'] = altered
-            log.info("Before: $orig After: $altered")
+            log.info("\tBefore: $orig After: $altered")
         }
     }
 
     public void adjustProjectName()
     {
         def project = getAdjusted()[0]['project']
-        def uri = URI(getAdjusted()[0]['scmUrl'])
-        String repo, proj = project.split("/")
-        //Parse the URI and get path section (we could do this with regex but i'm lazy)
-        def path = uri.getPath()
-        String srepo, sproj = path.split("/")
-        if(proj.equals(sproj))
-            print "same project!"
-    }
+        def fixeduri = getAdjusted()[0]['scmUrl']
+        /*
+        This is a bit overly specific we need to figure out how to convert
+        user@domain.com:somerepo/project to a valid URI (git+ssh)
+        */
+        if (fixeduri.startsWith("git@"))
+        {
+            fixeduri = fixeduri.replace("git@", "git+ssh://")
+            fixeduri = fixeduri.replace(".com:", ".com/")
+        }
 
+        //Parse the URI and get path section (we could do this with regex but i'm lazy)
+        def uri =  new URI(fixeduri)
+        def path = uri.getPath()
+
+        def (repo, proj) = project.split("/")
+        def (none, srepo, sproj) = path.split("/")
+        
+        sproj = sproj.replace(".git", "")
+        if(proj.equals(sproj) && !srepo.equals(repo))
+        {
+            log.info("Adjusting project in BC as it differs from scmUrl:")
+            repo = srepo
+            project = repo + "/" + proj
+            def orig = getAdjusted()[0]['project']
+            log.info("\tBefore $orig After $project")
+            adjustedParsedSection[0]['project'] = project
+        }
+    }
+    
+    public void adjustDependencies(BuildConfigSection other)
+    {
+        for (dependency in adjustedParsedSection[0]['dependencies'])
+        {
+            def otherOriginalName = other.getOriginal()[0]['name']
+            def otherName = other.getAdjusted()[0]['name']
+            if(!otherName.equals(otherOriginalName))
+            {
+                if(otherOriginalName.equals(dependency) && !otherName.equals(dependency))
+                {
+                    dependency = other.getAdjusted()[0]['name']
+                    log.info("Adjusting dependency in ${adjustedParsedSection[0]['name']} from $otherOriginalName to $dependency")
+                }
+            }
+        }
+    }
 }
 
 /* Pre-parser and amalgimator */
@@ -265,14 +308,45 @@ class BuildConfig {
                 log.debug("\n\n\n" + "-------START------\n" + "- name: $p" + "########END#######\n")
                 def section = new BuildConfigSection("- name: "+p)
                 buildConfigs.add(section)
+                //Use github (upstream/midstream)
                 section.swapInternalAndExternalURL()
+                //Change the BC name to match the scm tag ver
                 section.adjustBuildConfigName()
+                //Change the project section to match repo location
                 section.adjustProjectName()
-                //println section.getAdjusted()
-                //println section.getOriginal()
             }
         }
+        //Re-target dependencies
+        for (bcs in buildConfigs)
+        {
+            for (bcsr in buildConfigs)
+            {
+                bcs.adjustDependencies(bcsr)
+            }
+        }
+        this.dump()
     }
+
+    public String dump()
+    {
+        //Load our original
+        def parsed = parsedAmalgimatedYaml.load(rawFileContents)
+        //clear the old builds
+        parsed['builds'] = []
+        for (b in buildConfigs)
+        {
+            parsed['builds'].add(b.getAdjusted()[0])
+        }
+        DumperOptions options = new DumperOptions() 
+        options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK)
+        options.setLineBreak(DumperOptions.LineBreak.getPlatformLineBreak())
+        options.setSplitLines(true)
+        options.setPrettyFlow(true)
+        options.setWidth(30) 
+        Yaml yaml = new Yaml(options)
+        println yaml.dump(parsed)
+    }
+
 }
 
 
@@ -285,13 +359,3 @@ log.info("Attempting to load file $yamlpath")
 def rawYamlFileH = new File(yamlpath)
 BuildConfig bc = new BuildConfig(rawYamlFileH, project.getProperties())
 
-//println "Test property" + project.properties.project
-
-/*
-class Main
-{
-    static void main(def args)
-    {
-        //BuildConfig bc = BuildConfig(new File("$project.properties['project.build.outputDirectory']", "build.yaml"))
-    }
-}*/
