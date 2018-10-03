@@ -13,14 +13,16 @@ import java.net.URLEncoder
 import groovy.json.JsonOutput.*
 import com.rits.cloning.Cloner
 import java.net.URI
+import org.apache.commons.lang3.text.WordUtils
 
 @Slf4j
 class VersionManipulator 
 {
-    public static final Pattern OSGIPattern = Pattern.compile("(?:[\\w|-]*)((?<major>\\d+)\\.(?<minor>\\d+)\\.(?<micro>\\d+)){1}(?:[\\.|-])?(?<qualifier>.*)")
+    public static final Pattern OSGIPattern = Pattern.compile("(?<name>[\\w|-]*)((?<major>\\d+)\\.(?<minor>\\d+)\\.(?<micro>\\d+)){1}(?:[\\.|-])?(?<qualifier>.*)")
     //public static final Pattern redhatQualifierPattern = Pattern.compile("^[\w-]*-?redhat-(\d+)")
 
     protected String original
+    public String name
 
     //Our version deciminated to ints
     public Integer major = 0
@@ -52,12 +54,12 @@ class VersionManipulator
                 String mat = m.group(i)
                 log.debug("Found $mat")
             }
+            name = m.group("name")
             major = major.valueOf(m.group("major"))
             minor = minor.valueOf(m.group("minor"))
             micro = micro.valueOf(m.group("micro"))
             qualifier = m.group("qualifier")
         }
-
     }
 
     public String getOriginal()
@@ -80,7 +82,7 @@ class VersionManipulator
     {
         return ArrayList[major, minor, micro]
     }
-    
+
     public Map<String, Integer> semverMap()
     {
         Map<String, Integer> semverMap = new HashMap<String, Integer>(
@@ -88,12 +90,13 @@ class VersionManipulator
             "minor":minor,
             "micro":micro);
     }
-   
+
     public String swap(VersionManipulator other)
     {
         def o = this.original
         return o.replaceAll(semverString(), other.semverString())
     }
+
     /*
     public Integer compare(VersionManipulator other)
     {
@@ -158,6 +161,31 @@ class BuildConfigSection {
         adjustedParsedSection = new Yaml().load(commentsToString(rawSection))
     }
 
+    public void recomment()
+    {
+        /*
+        def inter =  parsedSection[0].intersect(adjustedParsedSection[0])
+        log.debug("Recommenting section\n before:$adjustedParsedSection \nafter: $inter")
+        adjustedParsedSection = new ArrayList()
+        adjustedParsedSection.add(inter)*/
+
+        /* I was sick in my mouth a little bit writing this but it works */
+        def toRemove = new ArrayList()
+        for(k in adjustedParsedSection[0].keySet())
+        {
+            
+            if(!parsedSection[0].containsKey(k))
+            {
+                log.debug("missing $k, from $adjustedParsedSection removing")
+                toRemove.add(k)
+            }
+        }
+        for(k in toRemove)
+        {
+            adjustedParsedSection[0].remove(k)
+        }
+    }
+
     public String commentsToString(String raw)
     {
         def stripped = raw.replaceAll("([\\s]{4}#)", "  ")
@@ -176,6 +204,14 @@ class BuildConfigSection {
                     a[k] = decodeURLs(a[k])
             }
         }
+    }
+
+    public String friendlyName()
+    {
+        def adj = getAdjusted()
+        log.debug("Looking for version in $adj")
+        def version = new VersionManipulator(adj[0]['name'])
+        return WordUtils.capitalizeFully(version.name.replaceAll("-", " ").trim())
     }
 
     public void swapInternalAndExternalURL()
@@ -239,7 +275,23 @@ class BuildConfigSection {
             adjustedParsedSection[0]['project'] = project
         }
     }
-    
+
+    public boolean hasDependency(BuildConfigSection other, boolean adjustedOnly)
+    {
+        boolean match = false
+        for (dependency in adjustedParsedSection[0]['dependencies'])
+        {
+            if(!adjustedOnly)
+            {
+                if(other.getOriginal()[0]['name'].equals(dependency))
+                    match = true
+            }
+            if(other.getAdjusted()[0]['name'].equals(dependency))
+                match = true
+        }
+        return match
+    }
+
     public void adjustDependencies(BuildConfigSection other)
     {
         for (dependency in adjustedParsedSection[0]['dependencies'])
@@ -265,16 +317,8 @@ class BuildConfig {
     private Map<String, String> mavenProperties
     public Yaml parsedAmalgimatedYaml = new Yaml()
     private def buildConfigs = []
+    private Map<Integer, BuildConfigSection> deptree; 
 
-    /* Steps 
-    1) Read file from maven
-    2) Read properties from maven
-    3) Preparse
-    4) Preparsed -> BuildConfigSection[]
-    5) Amalgimate sections
-    */
-
-    
     public BuildConfig(String filePath, Map<String> properties)
     {
         this.BuildConfig(new File(filePath), properties)
@@ -287,6 +331,10 @@ class BuildConfig {
         this.preParse()
     }
 
+    public String depGraph()
+    {
+        
+    }
     private void preParse()
     {
         //Skip Ahead in string to "builds:"
@@ -314,6 +362,7 @@ class BuildConfig {
                 section.adjustBuildConfigName()
                 //Change the project section to match repo location
                 section.adjustProjectName()
+                section.recomment()
             }
         }
         //Re-target dependencies
