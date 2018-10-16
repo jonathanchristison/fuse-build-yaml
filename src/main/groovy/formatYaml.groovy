@@ -11,6 +11,8 @@ import groovy.util.logging.Slf4j
 import java.net.URLDecoder
 import java.net.URLEncoder
 import groovy.json.JsonOutput.*
+//SimpleTemplateEngine
+import groovy.text.*
 import com.rits.cloning.Cloner
 import java.net.URI
 import org.apache.commons.lang3.text.WordUtils
@@ -137,6 +139,10 @@ class BuildConfigSection {
         adjustedParsedSection = cloner.deepClone(parsedSection)
     }
 
+    public String getOriginalAsString()
+    {
+        return rawSection
+    }
     public ArrayList getOriginal()
     {
         return parsedSection
@@ -173,7 +179,6 @@ class BuildConfigSection {
         def toRemove = new ArrayList()
         for(k in adjustedParsedSection[0].keySet())
         {
-            
             if(!parsedSection[0].containsKey(k))
             {
                 log.debug("missing $k, from $adjustedParsedSection removing")
@@ -222,9 +227,9 @@ class BuildConfigSection {
         def diff =  getAdjusted()[0] - getOriginal()[0]
 
         //This will be changing soon
-        if(diff['internalScmUrl'])
+        if(diff['pushScmUrl'])
         {
-            adjustedParsedSection[0]['scmUrl'] = diff['internalScmUrl']
+            adjustedParsedSection[0]['scmUrl'] = diff['pushScmUrl']
         }
     }
 
@@ -262,8 +267,19 @@ class BuildConfigSection {
         def path = uri.getPath()
 
         def (repo, proj) = project.split("/")
-        def (none, srepo, sproj) = path.split("/")
-        
+        //work around for fabric8io- instead of fabric8io/
+        def splpath = path.split("/")
+        def srepo, sproj
+        if(splpath.size() > 2)
+        {
+            srepo = splpath[1]
+            sproj = splpath[2]
+        }
+        else
+        {
+            srepo = (String) splpath[1].split("-")[0]
+            sproj = (String) splpath[1].split("-")[1..-1].join("-")
+        }
         sproj = sproj.replace(".git", "")
         if(proj.equals(sproj) && !srepo.equals(repo))
         {
@@ -273,6 +289,10 @@ class BuildConfigSection {
             def orig = getAdjusted()[0]['project']
             log.info("\tBefore $orig After $project")
             adjustedParsedSection[0]['project'] = project
+        }
+        else if(!proj.equals(sproj))
+        {
+            log.error("$proj and $sproj do not match")
         }
     }
 
@@ -315,7 +335,7 @@ class BuildConfigSection {
 class BuildConfig {
     private String rawFileContents
     private Map<String, String> mavenProperties
-    public Yaml parsedAmalgimatedYaml = new Yaml()
+    public Yaml parsedAmalgimatedYaml
     private def buildConfigs = []
     private Map<Integer, BuildConfigSection> deptree; 
 
@@ -328,17 +348,99 @@ class BuildConfig {
     {
         rawFileContents = file.getText('UTF-8')
         mavenProperties = properties
+
+        DumperOptions options = new DumperOptions() 
+        options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK)
+        options.setLineBreak(DumperOptions.LineBreak.getPlatformLineBreak())
+        options.setSplitLines(true)
+        options.setPrettyFlow(true)
+        options.setWidth(30)
+        parsedAmalgimatedYaml = new Yaml(options)
         this.preParse()
+        this.depGraph()
     }
 
     public String depGraph()
     {
-        
+        def templ = new GStringTemplateEngine()
+        def source = '''
+            <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+            <html> 
+            <head>
+            <title>Fuse 7 Dependencies</title>
+            <script type="text/javascript" src="http://visjs.org/dist/vis.js"></script>
+            <link href="http://visjs.org/dist/vis.css" rel="stylesheet" type="text/css" />
+            </head>
+
+            <body>
+            <h1>Fuse 7 Dependencies</h1>
+
+            <div id="deptree"></div>
+
+            <script type="text/javascript">
+            var components = new vis.DataSet([
+            <% nodes.each { n -> %>
+                { id: <%= n.id %>, label: '<%= n.friendlyname %>' } <%} %>
+            ]);
+
+            var dependencies = new vis.DataSet([
+            { from: 3, to: 1, arrows: 'to' },
+            { from: 3, to: 2, arrows: 'to' },
+            { from: 4, to: 1, arrows: 'to' },
+            { from: 4, to: 3, arrows: 'to' },
+            { from: 5, to: 4, arrows: 'to' },
+            { from: 6, to: 4, arrows: 'to' },
+            { from: 7, to: 4, arrows: 'to' },
+            { from: 8, to: 4, arrows: 'to' },
+            { from: 9, to: 4, arrows: 'to' },
+            { from: 11, to: 6, arrows: 'to' },
+            { from: 11, to: 8, arrows: 'to' },
+            { from: 11, to: 9, arrows: 'to' },
+            { from: 13, to: 12, arrows: 'to' },
+            { from: 14, to: 13, arrows: 'to' },
+            { from: 16, to: 11, arrows: 'to' },
+            { from: 16, to: 15, arrows: 'to' },
+            { from: 16, to: 14, arrows: 'to' },
+            { from: 17, to: 16, arrows: 'to' },
+            { from: 19, to: 18, arrows: 'to' },
+            { from: 19, to: 8, arrows: 'to' },
+            { from: 19, to: 9, arrows: 'to' },
+            { from: 20, to: 19, arrows: 'to' },
+            { from: 21, to: 20, arrows: 'to' },
+            { from: 22, to: 21, arrows: 'to' },
+            { from: 22, to: 11, arrows: 'to' },
+            { from: 22, to: 17, arrows: 'to' },
+            { from: 23, to: 16, arrows: 'to' },
+            { from: 24, to: 4, arrows: 'to' },
+            { from: 25, to: 24, arrows: 'to' }
+            ]);
+
+            var container = document.getElementById('deptree');
+            var data = {
+               nodes: components,
+               edges: dependencies
+            };
+
+            var options = {
+            };
+
+            var deptree = new vis.Network(container, data, options);
+            </script>
+            </body> </html>
+            '''
+
+        def nodes = [:]
+        nodes << [ id: 0, friendlyname: "foo" ]
+        nodes << [ id: 1, friendlyname: "bar" ]
+        def output = templ.createTemplate(source).make(nodes).toString()
+        print output
+
     }
-    private void preParse()
+
+    private ArrayList preParse(String raw)
     {
         //Skip Ahead in string to "builds:"
-        def spl = rawFileContents.split("builds:")
+        def spl = raw.split("builds:")
 
         //Dont try and parse extras
         Pattern extraPattern = Pattern.compile("(outputPrefixes:.*)")
@@ -347,7 +449,8 @@ class BuildConfig {
         //Read each " - name: " section (grab with newline delim)"
         Pattern sectionPattern = Pattern.compile("(?<!#)(- name:)")
         def splPattern = sectionPattern.split(stripExtra[0])
-        
+
+        def bc = []
         for ( p in splPattern )
         {
             if(p.length() > 2)
@@ -355,24 +458,35 @@ class BuildConfig {
                 log.debug("Preparsing BC sections")
                 log.debug("\n\n\n" + "-------START------\n" + "- name: $p" + "########END#######\n")
                 def section = new BuildConfigSection("- name: "+p)
-                buildConfigs.add(section)
-                //Use github (upstream/midstream)
-                section.swapInternalAndExternalURL()
-                //Change the BC name to match the scm tag ver
-                section.adjustBuildConfigName()
-                //Change the project section to match repo location
-                section.adjustProjectName()
-                section.recomment()
+                bc.add(section)
             }
         }
-        //Re-target dependencies
-        for (bcs in buildConfigs)
+        return bc
+    }
+    
+    private void preParse()
+    {
+        def buildsections = this.preParse(rawFileContents)
+        for(section in buildsections)
         {
-            for (bcsr in buildConfigs)
+            //Use github (upstream/midstream)
+        //section.swapInternalAndExternalURL()
+            //Change the BC name to match the scm tag ver
+            section.adjustBuildConfigName()
+            //Change the project section to match repo location
+            section.adjustProjectName()
+            section.recomment()
+        }
+        //Re-target dependencies
+        log.info("Readjusting dependencies")
+        for (bcs in buildsections)
+        {
+            for (bcsr in buildsections)
             {
                 bcs.adjustDependencies(bcsr)
             }
         }
+        buildConfigs = buildsections
         this.dump()
     }
 
@@ -386,14 +500,19 @@ class BuildConfig {
         {
             parsed['builds'].add(b.getAdjusted()[0])
         }
-        DumperOptions options = new DumperOptions() 
-        options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK)
-        options.setLineBreak(DumperOptions.LineBreak.getPlatformLineBreak())
-        options.setSplitLines(true)
-        options.setPrettyFlow(true)
-        options.setWidth(30) 
-        Yaml yaml = new Yaml(options)
-        println yaml.dump(parsed)
+        //def templ = new SimpleTemplateEngine()
+        //print parsedAmalgimatedYaml.dump(parsed)
+        
+        //Make it a little bit more pretty
+        String ret = parsedAmalgimatedYaml.dump(parsed)
+
+        def spl = ret.split("builds:")
+        def pretty = spl[0]
+        for(b in preParse(ret))
+        {
+            pretty = pretty + "\n" + b.getOriginalAsString() + "\n"
+        }
+        print pretty
     }
 
 }

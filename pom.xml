@@ -195,7 +195,9 @@
                 </goals>
                 <configuration>
                     <properties>
-                        <foo>bar</foo>
+                        <swapScmUrl>true</swapScmUrl>
+                        <keepOrginalAsComment>true</keepOrginalAsComment>
+                        <generateDepGraph>true</generateDepGraph>
                     </properties>
                     <source>${project.basedir}/src/main/groovy/formatYaml.groovy</source>
                 </configuration>
