@@ -512,10 +512,15 @@ class BuildConfig {
 def yamlpath = Paths.get(project.getBuild().getDirectory(), "extra-resources", "build.yaml").toString()
 log.info("Attempting to load file $yamlpath") 
 def rawYamlFileH = new File(yamlpath)
+
+//Load our YAML file and fix it
 BuildConfig bc = new BuildConfig(rawYamlFileH, project.getProperties())
 
+//Print the fixed yaml to term (we can add a write back funct at some point)
 print bc.dump()
-def depgraphoutputpath = Paths.get(project.getBuild().getDirectory(), "extra-resources", "Deptree.html").toString()
-def depgraphoutputf = new File(depgraphoutputpath)
+
+//Write and print the depgraph to the target dir, we need to add it to the POM to deploy it (todo)
+def depgraphoutputf = new File(Paths.get(project.getBuild().getDirectory(), "extra-resources", "Deptree.html").toString())
 depgraphoutputf << bc.depGraph()
+print bc.depGraph()
 
