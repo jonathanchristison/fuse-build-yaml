@@ -11,11 +11,12 @@ import groovy.util.logging.Slf4j
 import java.net.URLDecoder
 import java.net.URLEncoder
 import groovy.json.JsonOutput.*
-//SimpleTemplateEngine
+//GStringTemplateEngine
 import groovy.text.*
 import com.rits.cloning.Cloner
 import java.net.URI
 import org.apache.commons.lang3.text.WordUtils
+import groovy.json.*
 
 @Slf4j
 class VersionManipulator 
@@ -337,8 +338,7 @@ class BuildConfig {
     private Map<String, String> mavenProperties
     public Yaml parsedAmalgimatedYaml
     private def buildConfigs = []
-    private Map<Integer, BuildConfigSection> deptree; 
-
+    
     public BuildConfig(String filePath, Map<String> properties)
     {
         this.BuildConfig(new File(filePath), properties)
@@ -357,7 +357,6 @@ class BuildConfig {
         options.setWidth(30)
         parsedAmalgimatedYaml = new Yaml(options)
         this.preParse()
-        this.depGraph()
     }
 
     public String depGraph()
@@ -367,52 +366,25 @@ class BuildConfig {
             <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
             <html> 
             <head>
-            <title>Fuse 7 Dependencies</title>
+            <title><%=product.name%> <%=product.version%> <%=product.stage%> Dep tree</title>
             <script type="text/javascript" src="http://visjs.org/dist/vis.js"></script>
             <link href="http://visjs.org/dist/vis.css" rel="stylesheet" type="text/css" />
             </head>
 
             <body>
-            <h1>Fuse 7 Dependencies</h1>
+            <h1><%=product.name%> <%=product.version%> <%=product.stage%> Dependencies</h1>
 
             <div id="deptree"></div>
 
             <script type="text/javascript">
             var components = new vis.DataSet([
-            <% nodes.each { n -> %>
-                { id: <%= n.id %>, label: '<%= n.friendlyname %>' } <%} %>
+            <% nodes.eachWithIndex { n, index -> %>
+                { id:<%= n.id %>, label: '<%= n.friendlyname %>'}<% if(index != nodes.size()-1) out << ',' %> <%} %>
             ]);
 
             var dependencies = new vis.DataSet([
-            { from: 3, to: 1, arrows: 'to' },
-            { from: 3, to: 2, arrows: 'to' },
-            { from: 4, to: 1, arrows: 'to' },
-            { from: 4, to: 3, arrows: 'to' },
-            { from: 5, to: 4, arrows: 'to' },
-            { from: 6, to: 4, arrows: 'to' },
-            { from: 7, to: 4, arrows: 'to' },
-            { from: 8, to: 4, arrows: 'to' },
-            { from: 9, to: 4, arrows: 'to' },
-            { from: 11, to: 6, arrows: 'to' },
-            { from: 11, to: 8, arrows: 'to' },
-            { from: 11, to: 9, arrows: 'to' },
-            { from: 13, to: 12, arrows: 'to' },
-            { from: 14, to: 13, arrows: 'to' },
-            { from: 16, to: 11, arrows: 'to' },
-            { from: 16, to: 15, arrows: 'to' },
-            { from: 16, to: 14, arrows: 'to' },
-            { from: 17, to: 16, arrows: 'to' },
-            { from: 19, to: 18, arrows: 'to' },
-            { from: 19, to: 8, arrows: 'to' },
-            { from: 19, to: 9, arrows: 'to' },
-            { from: 20, to: 19, arrows: 'to' },
-            { from: 21, to: 20, arrows: 'to' },
-            { from: 22, to: 21, arrows: 'to' },
-            { from: 22, to: 11, arrows: 'to' },
-            { from: 22, to: 17, arrows: 'to' },
-            { from: 23, to: 16, arrows: 'to' },
-            { from: 24, to: 4, arrows: 'to' },
-            { from: 25, to: 24, arrows: 'to' }
+            <% edges.eachWithIndex { e, index -> %>
+                { from:<%= e.from %>, to:<%= e.to %>, arrows: 'to'}<% if(index != edges.size()-1) out << ',' %> <%} %>
             ]);
 
             var container = document.getElementById('deptree');
@@ -428,13 +400,24 @@ class BuildConfig {
             </script>
             </body> </html>
             '''
+        HashMap parsed = this.dumpAsObj(rawFileContents)
+        def product = parsed['product']['name']
+        def version = parsed['version']
+        def stage = parsed['product']['stage']
 
-        def nodes = [:]
-        nodes << [ id: 0, friendlyname: "foo" ]
-        nodes << [ id: 1, friendlyname: "bar" ]
-        def output = templ.createTemplate(source).make(nodes).toString()
-        print output
-
+        def nodes = [nodes:[],edges:[],product:[name:product, version:version, stage:stage]] //[id:0, friendlyname:"foo"], [id:1, friendlyname:"bar"]]]
+        for( bc in buildConfigs )
+        {
+            nodes['nodes'] << [id: bc.hashCode(), friendlyname:bc.friendlyName()]
+            for( bcs in buildConfigs )
+            {
+                if(bc.hasDependency(bcs, true))
+                nodes['edges'] << [from:bc.hashCode(), to: bcs.hashCode()]
+            }
+        }
+        //println new JsonBuilder( nodes ).toPrettyString()
+        ///print nodes
+        return templ.createTemplate(source).make(nodes).toString()
     }
 
     private ArrayList preParse(String raw)
@@ -487,13 +470,17 @@ class BuildConfig {
             }
         }
         buildConfigs = buildsections
-        this.dump()
+    }
+    
+    public HashMap dumpAsObj(String fileAsString)
+    {
+        return parsedAmalgimatedYaml.load(fileAsString)
     }
 
     public String dump()
     {
         //Load our original
-        def parsed = parsedAmalgimatedYaml.load(rawFileContents)
+        def parsed = this.dumpAsObj(rawFileContents)
         //clear the old builds
         parsed['builds'] = []
         for (b in buildConfigs)
@@ -512,7 +499,7 @@ class BuildConfig {
         {
             pretty = pretty + "\n" + b.getOriginalAsString() + "\n"
         }
-        print pretty
+        return pretty
     }
 
 }
@@ -526,4 +513,9 @@ def yamlpath = Paths.get(project.getBuild().getDirectory(), "extra-resources", "
 log.info("Attempting to load file $yamlpath") 
 def rawYamlFileH = new File(yamlpath)
 BuildConfig bc = new BuildConfig(rawYamlFileH, project.getProperties())
+
+print bc.dump()
+def depgraphoutputpath = Paths.get(project.getBuild().getDirectory(), "extra-resources", "Deptree.html").toString()
+def depgraphoutputf = new File(depgraphoutputpath)
+depgraphoutputf << bc.depGraph()
 
